@@ -17,11 +17,22 @@
   },
   "homepage": "https://github.com/sibz/VersionBumper#readme",
   "devDependencies": {
+    "@ava/typescript": "^1.1.1",
     "@types/minimist": "^1.2.0",
     "@types/node": "^13.13.2",
-    "ava": "^3.7.1"
+    "ava": "^3.7.1",
+    "ts-node": "^8.9.0",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "minimist": "^1.2.5"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }
