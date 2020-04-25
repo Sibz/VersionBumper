@@ -1,3 +1,7 @@
+# Javascript src as it is generated
+src/js/
+
+
 # Logs
 logs
 *.log
