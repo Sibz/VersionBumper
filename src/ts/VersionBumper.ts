@@ -1,15 +1,17 @@
 import minimist from "minimist";
 import { promises as fs, stat } from "fs";
-import parseSemVer, { Version, SemVerParts } from "./parseSemVer";
+import parseSemVer, { semVerToString, Version, SemVerParts } from "./parseSemVer";
 
 export default class VersionBumper {
 
     PackageFilePath: string;
     SemVerPart: SemVerParts;
+    DontWrite: Boolean;
 
     constructor() {
         this.PackageFilePath = "";
         this.SemVerPart = SemVerParts.Patch;
+        this.DontWrite = false;
         this.parseArgs();
     }
 
@@ -23,32 +25,65 @@ export default class VersionBumper {
         } else if (args.M || args.major) {
             this.SemVerPart = SemVerParts.Major
         }
+        if (args.f || args.dontWrite) {
+            this.DontWrite = true;
+        }
     }
 
-    async updateVersion(): Promise<Version> {
+    async updateVersion(semVerPart: SemVerParts | null = null): Promise<Version> {
+        semVerPart = semVerPart ?? this.SemVerPart;
         if (!await checkAccessToFile(this.PackageFilePath)) {
             throw `Unable to access path: '${this.PackageFilePath}'`;
         }
 
         let packageJson: any = await getJSONObjectFromFile(this.PackageFilePath);
-        let version: Version = parseSemVer(packageJson);
-
-        return version;
+        let versionString = getVersionFromPackage(packageJson);
+        let version: Version = parseSemVer(versionString);
+        let newVersion = bumpVersion(version, semVerPart);
+        packageJson.version = semVerToString(newVersion);
+        if (!this.DontWrite)
+        {
+            await writeJsonObjectToFile(packageJson, this.PackageFilePath);
+        }   
+        return newVersion;
     }
 }
 
-export function bumpVersion(version: Version, semVerPart: SemVerParts) : Version {
-    let newVersion: Version = version;
-
-    return newVersion;
+export async function writeJsonObjectToFile(obj: any, path: string) {
+    try {
+        await fs.writeFile(path, JSON.stringify(obj, null, 2));
+    } catch {
+        throw new Error("Was unable to write json to file");
+    }
 }
 
-export const ERRORS = {
-    VERSION_NOT_FOUND: "Version field not found on object",
-    VERSION_NOT_A_STRING: "Argument not valid. Expected a string",
-    VERSION_NOT_VALID: "Passed string is not a valid SemVer",
+export function getVersionFromPackage(obj: any): string {
+    if (!obj.version) {
+        throw new Error("Version does not exist on object or is null");
+    }
+    if (typeof (obj.version) !== "string") {
+        throw new Error("Version field should be a string");
+    }
+    return obj.version;
+}
 
-};
+export function bumpVersion(version: Version, semVerPart: SemVerParts): Version {
+    let newVersion: Version = {} as Version;
+    Object.assign(newVersion, version);
+    switch (semVerPart) {
+        case SemVerParts.Major:
+            newVersion.M++;
+            break;
+        case SemVerParts.Minor:
+            newVersion.m++;
+            break;
+        case SemVerParts.Patch:
+            newVersion.p++;
+        default:
+            break;
+    }
+    return newVersion;
+}
 
 export async function checkAccessToFile(path: string): Promise<Boolean> {
     try {
@@ -61,7 +96,7 @@ export async function checkAccessToFile(path: string): Promise<Boolean> {
 
 export async function getJSONObjectFromFile(path: string): Promise<any> {
     try {
-        return (await fs.readFile(path)).toJSON;
+        return JSON.parse((await fs.readFile(path)).toString());
     } catch (e) {
         throw `Unable to read file '${path}' as json object.\n${e}`;
     }

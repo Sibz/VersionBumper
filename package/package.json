@@ -1,5 +1,4 @@
 {
-    "name": "versionbumper-test-package-file",
-    "version": "0.0.1.100"
+  "name": "versionbumper-test-package-file",
+  "version": "2.1.3"
 }
-  
