@@ -31,7 +31,7 @@ export default class VersionBumper {
         }
     }
 
-    async updateVersion() {
+    async updateVersion(): Promise<Version> {
         if (!await checkAccessToFile(this.PackageFilePath)) {
             throw `Unable to access path: '${this.PackageFilePath}'`;
         }
@@ -39,6 +39,7 @@ export default class VersionBumper {
         let packageJson: any = await getJSONObjectFromFile(this.PackageFilePath);
         let version: Version = getVersionFromPackageJsonObject(packageJson);
 
+        return version;
     }
 }
 
