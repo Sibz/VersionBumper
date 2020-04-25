@@ -1,5 +1,5 @@
 import test from 'ava';
-import * as vb from '../src/ts/VersionBumper';
+import * as vb from '../VersionBumper';
 
 test('checkAccessToFile: when packageFile does not exist should return false', async t=>{
     t.false(await vb.checkAccessToFile("invalid file"));

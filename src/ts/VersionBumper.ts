@@ -1,12 +1,6 @@
 import minimist from "minimist";
 import { promises as fs, stat } from "fs";
-
-enum SemVerParts {
-    Build,
-    Patch,
-    Minor,
-    Major
-}
+import parseSemVer, { Version, SemVerParts } from "./parseSemVer";
 
 export default class VersionBumper {
 
@@ -37,7 +31,7 @@ export default class VersionBumper {
         }
 
         let packageJson: any = await getJSONObjectFromFile(this.PackageFilePath);
-        let version: Version = getVersionFromPackageJsonObject(packageJson);
+        let version: Version = parseSemVer(packageJson);
 
         return version;
     }
@@ -49,37 +43,12 @@ export function bumpVersion(version: Version, semVerPart: SemVerParts) : Version
     return newVersion;
 }
 
-export function getVersionFromPackageJsonObject(obj: any): Version {
-    let version: Version = {} as Version;
-    if (!obj.version) {
-        throw "Version field not found on object";
-    }
-    if (typeof (obj.version) !== "string") {
-        throw "Version field not a string";
-    }
-    let versionArray = (obj.version as String).split(".");
-    if (versionArray.length < 3) {
-        throw "Version field must contain at least 3 semver parts (i.e. '1.2.3')";
-    }
-    try {
-        if (versionArray.length == 4) {
-            version.b = parseInt(versionArray[3]);
-        }
-        version.p = parseInt(versionArray[2]);
-        version.m = parseInt(versionArray[1]);
-        version.M = parseInt(versionArray[0]);
-    } catch {
-        throw "VersionBumper only supports integer version parts.";
-    }
-    return version;
-}
+export const ERRORS = {
+    VERSION_NOT_FOUND: "Version field not found on object",
+    VERSION_NOT_A_STRING: "Argument not valid. Expected a string",
+    VERSION_NOT_VALID: "Passed string is not a valid SemVer",
 
-export interface Version {
-    b?: number,
-    p: number,
-    m: number,
-    M: number
-}
+};
 
 export async function checkAccessToFile(path: string): Promise<Boolean> {
     try {
