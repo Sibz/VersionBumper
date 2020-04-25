@@ -18,5 +18,8 @@
   "homepage": "https://github.com/sibz/VersionBumper#readme",
   "devDependencies": {
     "@types/node": "^13.13.2"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5"
   }
 }
