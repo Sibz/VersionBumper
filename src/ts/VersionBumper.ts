@@ -51,7 +51,7 @@ export default class VersionBumper {
 
 export async function writeJsonObjectToFile(obj: any, path: string) {
     try {
-        await fs.writeFile(path, JSON.stringify(obj, null, 2));
+        await fs.writeFile(path, JSON.stringify(obj, null, 2), { flag: "r+"});
     } catch {
         throw new Error("Was unable to write json to file");
     }
