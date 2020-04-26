@@ -1,61 +1,67 @@
-export function parseSemVer(semver:string) : Version {
+export function parseSemVer(semver: string): Version {
     let version: Version = {} as Version;
-    if (typeof(semver) !== "string") {
+    if (typeof (semver) !== "string") {
         throw new Error(ERR_ARG_NOT_A_STRING);
     }
 
-    if (!REGEX_SEMVER.test(semver))
-    {
+    if (!REGEX_SEMVER.test(semver)) {
         throw new Error(ERR_ARG_NOT_VALID_SEMVER);
     }
     let result = REGEX_SEMVER.exec(semver);
-    if (!result)
-    {
+    if (!result) {
         throw new Error(ERR_UNABLE_TO_PARSE);
     }
     version.M = parseInt(result[1]);
     version.m = parseInt(result[2]);
     version.p = parseInt(result[3]);
     version.build = result[4];
-    if (version.build)
-    {
+    if (version.build) {
         let buildArray = version.build.split('.');
         if (buildArray.length > 0) {
-            let n = parseInt(buildArray[buildArray.length-1]);
-            if (!isNaN(n))
-            {
+            let n = parseInt(buildArray[buildArray.length - 1]);
+            if (!isNaN(n)) {
                 version.buildNumber = n;
             }
         }
     }
     version.meta = result[5];
 
-    return version;    
+    return version;
 }
 
-export function semVerToString(version: Version) : string {
+export function setBuildNumber(version: Version, num: number): Version {
+    let newVersion: Version = {} as Version;
+    Object.assign(newVersion, version);
+    newVersion.buildNumber = num;
+    if (newVersion.build) {
+        let buildArray = newVersion.build.split('.');
+        if (buildArray.length == 1) {
+            let n = parseInt(buildArray[buildArray.length - 1]);
+            if (isNaN(n)) {
+                newVersion.build = `${newVersion.build}.${newVersion.buildNumber}`;
+            } else {
+                newVersion.build = `${newVersion.buildNumber}`;
+            }
+        } else if (buildArray.length > 1) {
+            buildArray[buildArray.length - 1] = newVersion.buildNumber.toString();
+            newVersion.build = `${buildArray.join('.')}`;
+        }
+    } else {
+        newVersion.build = `${newVersion.buildNumber}`;
+    }
+    return newVersion;
+}
+
+export function semVerToString(version: Version): string {
     let result: string = `${version.M}.${version.m}.${version.p}`;
+    if (version.buildNumber){
+        version = setBuildNumber(version, version.buildNumber);
+    }
     if (version.build)
     {
-        if (version.buildNumber)
-        {
-            let buildArray = version.build.split('.');
-            if (buildArray.length == 1)
-            {
-                result += `-${version.build}.${version.buildNumber}`;
-            } else if (buildArray.length > 1)
-            {
-                buildArray[buildArray.length-1] = version.buildNumber.toString();
-                result += `-${buildArray.join('.')}`;
-            }
-        } else {
-            result += `-${version.build}`;
-        }
-    } else if (version.buildNumber) {
-        result += `-${version.buildNumber}`;
+        result += `-${version.build}`;
     }
-    if (version.meta)
-    {
+    if (version.meta) {
         result += `+${version.meta}`;
     }
     return result;

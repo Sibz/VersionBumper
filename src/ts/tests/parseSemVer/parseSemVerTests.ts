@@ -70,7 +70,7 @@ test('ToString: When 3 part with build and build number should only update last 
 
 test('ToString: When BuildNumber provided, but Build is undefined, should only output build number', t=> {
     t.is(psv.semVerToString({M:1,m:2,p:3, build:undefined, buildNumber: 256} as psv.Version), "1.2.3-256");
-})
+});
 
 test('ToString: When 3 part with meta should form valid string', t=> {
     t.is(psv.semVerToString({M:1,m:2,p:3, meta:"meta"} as psv.Version), "1.2.3+meta");
@@ -78,4 +78,22 @@ test('ToString: When 3 part with meta should form valid string', t=> {
 
 test('ToString: When 3 part with build and meta should form valid string', t=> {
     t.is(psv.semVerToString({M:1,m:2,p:3, build:"alpha", meta:"meta"} as psv.Version), "1.2.3-alpha+meta");
+});
+
+test('setBuildNumber: When build is text, should append number', t=> {
+    t.is(psv.setBuildNumber({M:1,m:2,p:3, build:"alpha", meta:"meta"} as psv.Version, 0).build, "alpha.0");
+});
+
+test('setBuildNumber: When build is not null and multipart num, should set last part to number', t=> {
+    t.is(psv.setBuildNumber({M:1,m:2,p:3, build:"alpha.1.2.4", meta:"meta"} as psv.Version, 0).build, "alpha.1.2.0");
+});
+
+test('setBuildNumber: When build is not null and just a number, should set to number', t=> {
+    t.is(psv.setBuildNumber({M:1,m:2,p:3, build:"4", meta:"meta"} as psv.Version, 0).build, "0");
+});
+
+test('setBuildNumber: When build is null, should set to number', t=> {
+    var x = psv.setBuildNumber({M:1,m:2,p:3, meta:"meta"} as psv.Version, 1);
+    console.log(x);
+    t.is(x.build, "1");
 });

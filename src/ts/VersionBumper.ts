@@ -1,6 +1,6 @@
 import minimist from "minimist";
 import { promises as fs, stat } from "fs";
-import parseSemVer, { semVerToString, Version, SemVerParts } from "./parseSemVer";
+import parseSemVer, { semVerToString, Version, SemVerParts, setBuildNumber } from "./parseSemVer";
 
 export interface VersionBumperOptions {
     packageFilePath?: string,
@@ -108,18 +108,33 @@ export function bumpVersion(version: Version, semVerPart: SemVerParts,reset: boo
     switch (semVerPart) {
         case SemVerParts.Major:
             newVersion.M = resetOrBump(reset, newVersion.M);
+            newVersion.m = 0;
+            newVersion.p = 0;
+            if (newVersion.buildNumber)
+            {
+                newVersion = setBuildNumber(newVersion, 0);
+            }
             break;
         case SemVerParts.Minor:
             newVersion.m = resetOrBump(reset, newVersion.m);
+            newVersion.p = 0;
+            if (newVersion.buildNumber)
+            {
+                newVersion = setBuildNumber(newVersion, 0);
+            }
             break;
         case SemVerParts.Patch:
             newVersion.p = resetOrBump(reset, newVersion.p);
+            if (newVersion.buildNumber)
+            {
+                newVersion = setBuildNumber(newVersion, 0);
+            }
             break
         case SemVerParts.BuildNumber:
             if (newVersion.buildNumber)
-                newVersion.buildNumber = resetOrBump(reset, newVersion.buildNumber);
+                newVersion = setBuildNumber(newVersion, resetOrBump(reset, newVersion.buildNumber));
             else
-                newVersion.buildNumber = 0;
+                newVersion = setBuildNumber(newVersion, 0);
             break;
         default:
             break;

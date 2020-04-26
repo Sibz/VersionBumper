@@ -25,6 +25,27 @@ test('bumpVersion: When major specified, Should increment major by one', t => {
     t.is(vb.bumpVersion({ M: 1 } as Version, SemVerParts.Major).M, 2);
 });
 
+test('bumpVersion: When major specified, Should reset minor, patch and build number', t => {
+    let startVer = { M: 1, m: 1, p: 1, buildNumber: 10} as Version;
+    let expected = { M: 2, m: 0, p: 0, build: "0", buildNumber: 0} as Version;
+    let actual = vb.bumpVersion(startVer, SemVerParts.Major)
+    t.deepEqual(actual, expected);
+});
+
+test('bumpVersion: When minor specified, Should reset patch and build number', t => {
+    let startVer = { M: 1, m: 1, p: 1, build: "1", buildNumber: 1} as Version;
+    let expected = { M: 1, m: 2, p: 0, build: "0", buildNumber: 0} as Version;
+    let actual = vb.bumpVersion(startVer, SemVerParts.Minor)
+    t.deepEqual(actual, expected);
+});
+
+test('bumpVersion: When patch specified, Should reset build number', t => {
+    let startVer = { M: 1, m: 1, p: 1, build:'alpha.1', buildNumber: 1} as Version;
+    let expected = { M: 1, m: 1, p: 2, build:'alpha.0', buildNumber: 0} as Version;
+    let actual = vb.bumpVersion(startVer, SemVerParts.Patch)
+    t.deepEqual(actual, expected);
+});
+
 test('bumpVersion: When minor specified, Should increment minor by one', t => {
     t.is(vb.bumpVersion({ m: 1 } as Version, SemVerParts.Minor).m, 2);
 });
@@ -88,19 +109,19 @@ test.afterEach.always('updateVersion: When dontWrite set, Should not update file
 });
 
 test('updateVersion: When defaults, should increment patch', async t => {
-    let expected: Version = { M: 1, m: 0, p: 1, build: "beta.10", meta: undefined, buildNumber: 10 };
+    let expected: Version = { M: 1, m: 0, p: 1, build: "beta.0", meta: undefined, buildNumber: 0 };
     let actual = await new VersionBumper({ packageFilePath: STATIC_TEST_FILE_PATH, dontWrite: true }).updateVersion();
     t.deepEqual(actual, expected);
 });
 
 test('updateVersion: When minor, should increment minor', async t => {
-    let expected: Version = { M: 1, m: 1, p: 0, build: "beta.10", meta: undefined, buildNumber: 10 };
+    let expected: Version = { M: 1, m: 1, p: 0, build: "beta.0", meta: undefined, buildNumber: 0 };
     let actual = await new VersionBumper({ packageFilePath: STATIC_TEST_FILE_PATH, dontWrite: true, semVerPart: SemVerParts.Minor }).updateVersion();
     t.deepEqual(actual, expected);
 });
 
 test('updateVersion: When major, should increment major', async t => {
-    let expected: Version = { M: 2, m: 0, p: 0, build: "beta.10", meta: undefined, buildNumber: 10 };
+    let expected: Version = { M: 2, m: 0, p: 0, build: "beta.0", meta: undefined, buildNumber: 0 };
     let actual = await new VersionBumper({ packageFilePath: STATIC_TEST_FILE_PATH, dontWrite: true, semVerPart: SemVerParts.Major }).updateVersion();
     t.deepEqual(actual, expected);
 });
