@@ -3,14 +3,14 @@ import VersionBumper, * as vb from '../VersionBumper';
 import { SemVerParts, Version, parseSemVer, semVerToString } from '../parseSemVer';
 import { promises as fs } from "fs";
 const TEST_FILE_PATH: string = "./testPackage.json";
-const STATIC_TEST_FILE_PATH: string = "./package/package.json";
+const STATIC_TEST_FILE_PATH: string = "./src/ts/tests/package/package.json";
 
 test('checkAccessToFile: when packageFile does not exist should return false', async t => {
     t.false(await vb.checkAccessToFile("invalid file"));
 });
 
 test('checkAccessToFile: when packageFile does exist should return true', async t => {
-    t.true(await vb.checkAccessToFile("./package/package.json"));
+    t.true(await vb.checkAccessToFile(STATIC_TEST_FILE_PATH));
 });
 
 test('bumpVersion: Should not modify original version', t => {

@@ -17,6 +17,17 @@ export function parseSemVer(semver:string) : Version {
     version.m = parseInt(result[2]);
     version.p = parseInt(result[3]);
     version.build = result[4];
+    if (version.build)
+    {
+        let buildArray = version.build.split('.');
+        if (buildArray.length > 1) {
+            let n = parseInt(buildArray[buildArray.length-1]);
+            if (n!=Number.NaN)
+            {
+                version.buildNumber = n;
+            }
+        }
+    }
     version.meta = result[5];
 
     return version;    
@@ -26,7 +37,20 @@ export function semVerToString(version: Version) : string {
     let result: string = `${version.M}.${version.m}.${version.p}`;
     if (version.build)
     {
-        result += `-${version.build}`;
+        if (version.buildNumber)
+        {
+            let buildArray = version.build.split('.');
+            if (buildArray.length == 1)
+            {
+                result += `-${version.build}.${version.buildNumber}`;
+            } else if (buildArray.length > 1)
+            {
+                buildArray[buildArray.length-1] = version.buildNumber.toString();
+                result += `-${buildArray.join('.')}`;
+            }
+        } else {
+            result += `-${version.build}`;
+        }
     }
     if (version.meta)
     {
@@ -38,6 +62,7 @@ export function semVerToString(version: Version) : string {
 export interface Version {
     meta?: string,
     build?: string,
+    buildNumber?: number,
     p: number,
     m: number,
     M: number
