@@ -8,16 +8,16 @@ export default class VersionBumper {
     SemVerPart: SemVerParts;
     DontWrite: Boolean;
 
-    constructor() {
-        this.PackageFilePath = "";
-        this.SemVerPart = SemVerParts.Patch;
-        this.DontWrite = false;
+    constructor(packageFilePath: string = "./package.json", semVerPart: SemVerParts = SemVerParts.Patch, dontWrite:Boolean = false) {
+        this.PackageFilePath = packageFilePath;
+        this.SemVerPart = semVerPart;
+        this.DontWrite = dontWrite;
         this.parseArgs();
     }
 
     parseArgs() {
         let args = minimist(process.argv);
-        this.PackageFilePath = args.packageFile ?? "./package.json";
+        this.PackageFilePath = args.packageFile ?? this.PackageFilePath;
         if (args.b || args.build) {
             this.SemVerPart = SemVerParts.Build
         } else if (args.m || args.minor) {
@@ -25,7 +25,7 @@ export default class VersionBumper {
         } else if (args.M || args.major) {
             this.SemVerPart = SemVerParts.Major
         }
-        if (args.f || args.dontWrite) {
+        if (!this.DontWrite && (args.f || args.dontWrite)) {
             this.DontWrite = true;
         }
     }
