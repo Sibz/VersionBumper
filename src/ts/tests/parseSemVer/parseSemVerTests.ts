@@ -62,6 +62,10 @@ test('ToString: When 3 part with build and build number should only update last 
     t.is(psv.semVerToString({M:1,m:2,p:3, build:"alpha.111.222.123", buildNumber: 256} as psv.Version), "1.2.3-alpha.111.222.256");
 });
 
+test('ToString: When BuildNumber provided, but Build is undefined, should only output build number', t=> {
+    t.is(psv.semVerToString({M:1,m:2,p:3, build:undefined, buildNumber: 256} as psv.Version), "1.2.3-256");
+})
+
 test('ToString: When 3 part with meta should form valid string', t=> {
     t.is(psv.semVerToString({M:1,m:2,p:3, meta:"meta"} as psv.Version), "1.2.3+meta");
 });

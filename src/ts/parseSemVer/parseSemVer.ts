@@ -51,6 +51,8 @@ export function semVerToString(version: Version) : string {
         } else {
             result += `-${version.build}`;
         }
+    } else if (version.buildNumber) {
+        result += `-${version.buildNumber}`;
     }
     if (version.meta)
     {
