@@ -42,6 +42,12 @@ test('When valid 3 part semver with build, build number and meta, should get ver
     t.deepEqual(version,expected);
 });
 
+test('When valid 3 part with build set to a single number, should get that number', t=> {
+    let version = parseSemVer("1.2.3-123");
+    let expected = { M: 1, m: 2, p: 3, build: "123", buildNumber:123, meta: undefined} as psv.Version;
+    t.deepEqual(version,expected);
+});
+
 test('ToString: When 3 part should form valid string', t=> {
     t.is(psv.semVerToString({M:1,m:2,p:3} as psv.Version), "1.2.3");
 });

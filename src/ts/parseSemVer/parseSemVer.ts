@@ -20,9 +20,9 @@ export function parseSemVer(semver:string) : Version {
     if (version.build)
     {
         let buildArray = version.build.split('.');
-        if (buildArray.length > 1) {
+        if (buildArray.length > 0) {
             let n = parseInt(buildArray[buildArray.length-1]);
-            if (n!=Number.NaN)
+            if (!isNaN(n))
             {
                 version.buildNumber = n;
             }
@@ -71,6 +71,8 @@ export interface Version {
 }
 
 export enum SemVerParts {
+    None,
+    BuildNumber,
     Meta,
     Build,
     Patch,
