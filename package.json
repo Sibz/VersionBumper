@@ -1,6 +1,6 @@
 {
   "name": "versionbumper",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "main": "src/ts/index.ts",
   "scripts": {
@@ -33,6 +33,9 @@
     ],
     "require": [
       "ts-node/register"
+    ],
+    "ignoredByWatcher": [
+      "./testPackage.json"
     ]
   }
 }
