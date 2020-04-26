@@ -15,30 +15,30 @@ test('checkAccessToFile: when packageFile does exist should return true', async 
 
 test('bumpVersion: Should not modify original version', t => {
     let original = { M: 1, m: 2, p: 3 } as Version;
-    vb.bumpVersion(false, original, SemVerParts.Major);
-    vb.bumpVersion(false, original, SemVerParts.Minor);
-    vb.bumpVersion(false, original, SemVerParts.Patch);
+    vb.bumpVersion(original, SemVerParts.Major);
+    vb.bumpVersion(original, SemVerParts.Minor);
+    vb.bumpVersion(original, SemVerParts.Patch);
     t.deepEqual(original, { M: 1, m: 2, p: 3 });
 });
 
 test('bumpVersion: When major specified, Should increment major by one', t => {
-    t.is(vb.bumpVersion(false, { M: 1 } as Version, SemVerParts.Major).M, 2);
+    t.is(vb.bumpVersion({ M: 1 } as Version, SemVerParts.Major).M, 2);
 });
 
 test('bumpVersion: When minor specified, Should increment minor by one', t => {
-    t.is(vb.bumpVersion(false, { m: 1 } as Version, SemVerParts.Minor).m, 2);
+    t.is(vb.bumpVersion({ m: 1 } as Version, SemVerParts.Minor).m, 2);
 });
 
 test('bumpVersion: When patch specified, Should increment patch by one', t => {
-    t.is(vb.bumpVersion(false, { p: 1 } as Version, SemVerParts.Patch).p, 2);
+    t.is(vb.bumpVersion({ p: 1 } as Version, SemVerParts.Patch).p, 2);
 });
 
 test('bumpVersion: When buildNumber specified, Should increment buildNumber by one', t => {
-    t.is(vb.bumpVersion(false, { buildNumber: 1 } as Version, SemVerParts.BuildNumber).buildNumber, 2);
+    t.is(vb.bumpVersion({ buildNumber: 1 } as Version, SemVerParts.BuildNumber).buildNumber, 2);
 });
 
 test('bumpVersion: When buildNumber specified and is currently undefined, Should set to zero', t => {
-    t.is(vb.bumpVersion(false, { buildNumber: undefined } as Version, SemVerParts.BuildNumber).buildNumber, 0);
+    t.is(vb.bumpVersion({ buildNumber: undefined } as Version, SemVerParts.BuildNumber).buildNumber, 0);
 });
 
 test('getVersionFromPackage: When version not on object, should throw', t => {
@@ -59,7 +59,7 @@ test.serial('updateVersion: Should actually update file', async t => {
     await fs.writeFile(testFilePath, JSON.stringify({ version: semVerToString(ver) }, null, 2));
     await new VersionBumper({ packageFilePath: testFilePath }).updateVersion();
     let verActual = parseSemVer(vb.getVersionFromPackage(await vb.getJSONObjectFromFile(testFilePath)));
-    let verExpected = vb.bumpVersion(false, ver, SemVerParts.Patch);
+    let verExpected = vb.bumpVersion(ver, SemVerParts.Patch);
     t.deepEqual(verActual, verExpected);
 });
 test.afterEach.always('updateVersion: Should actually update file', async () => {

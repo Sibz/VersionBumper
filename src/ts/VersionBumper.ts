@@ -62,7 +62,7 @@ export default class VersionBumper {
         let packageJson: any = await getJSONObjectFromFile(this.PackageFilePath);
         let versionString = getVersionFromPackage(packageJson);
         let version: Version = parseSemVer(versionString);
-        let newVersion = bumpVersion(this.Reset, version, semVerPart);
+        let newVersion = bumpVersion(version, semVerPart, this.Reset);
         newVersion = setBuildAndOrMeta(newVersion, this.Build, this.Meta);
         packageJson.version = semVerToString(newVersion);
         if (!this.DontWrite) {
@@ -102,7 +102,7 @@ export function getVersionFromPackage(obj: any): string {
     return obj.version;
 }
 
-export function bumpVersion(reset: boolean, version: Version, semVerPart: SemVerParts): Version {
+export function bumpVersion(version: Version, semVerPart: SemVerParts,reset: boolean = false): Version {
     let newVersion: Version = {} as Version;
     Object.assign(newVersion, version);
     switch (semVerPart) {
